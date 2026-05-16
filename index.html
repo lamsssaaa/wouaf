@@ -415,6 +415,12 @@
     animation: enter 1.5s 0.5s forwards, float-product 8s 2s ease-in-out infinite;
   }
   .product-hero svg { width: clamp(240px, 32vw, 400px); }
+  .product-hero-img {
+    width: clamp(280px, 38vw, 460px);
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 50px 80px rgba(0,0,0,0.5)) drop-shadow(0 0 60px rgba(232,168,124,0.15));
+  }
   @keyframes float-product {
     0%, 100% { transform: translateY(0) rotate(0deg); }
     50% { transform: translateY(-25px) rotate(-1deg); }
@@ -719,6 +725,15 @@
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .size:hover .size-vis { transform: translateY(-12px) scale(1.04); }
+
+  .size-img {
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 30px 50px rgba(0,0,0,0.5));
+  }
+  .size-img-mini    { width: 140px; }
+  .size-img-classic { width: 180px; filter: drop-shadow(0 35px 60px rgba(232,168,124,0.15)) drop-shadow(0 30px 50px rgba(0,0,0,0.5)); }
+  .size-img-max     { width: 210px; }
 
   .size-name {
     font-family: var(--serif);
@@ -1229,96 +1244,7 @@
       <div class="product-tag tag-3">App connectée</div>
 
       <div class="product-hero">
-        <svg viewBox="0 0 240 340" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="bodyGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" style="stop-color:#3a3835"/>
-              <stop offset="40%" style="stop-color:#1c1916"/>
-              <stop offset="100%" style="stop-color:#0a0908"/>
-            </linearGradient>
-            <linearGradient id="topGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#4a4845"/>
-              <stop offset="50%" style="stop-color:#2a2825"/>
-              <stop offset="100%" style="stop-color:#1c1916"/>
-            </linearGradient>
-            <radialGradient id="kibbleGlow" cx="50%" cy="50%">
-              <stop offset="0%" style="stop-color:#e8a87c;stop-opacity:0.4"/>
-              <stop offset="100%" style="stop-color:#e8a87c;stop-opacity:0"/>
-            </radialGradient>
-            <filter id="softGlow">
-              <feGaussianBlur stdDeviation="2"/>
-            </filter>
-          </defs>
-
-          <!-- Reflection shadow on ground -->
-          <ellipse cx="120" cy="320" rx="90" ry="6" fill="#000" opacity="0.5" filter="url(#softGlow)"/>
-
-          <!-- Top dome -->
-          <ellipse cx="120" cy="55" rx="78" ry="24" fill="url(#topGrad2)"/>
-          <path d="M 42 55 L 42 82 Q 42 86 46 86 L 194 86 Q 198 86 198 82 L 198 55 Z" fill="url(#topGrad2)"/>
-
-          <!-- Subtle highlight on top -->
-          <ellipse cx="105" cy="48" rx="40" ry="8" fill="#fff" opacity="0.06"/>
-
-          <!-- Main body -->
-          <rect x="42" y="86" width="156" height="148" rx="3" fill="url(#bodyGrad2)"/>
-
-          <!-- Highlight strip on body -->
-          <rect x="45" y="92" width="3" height="140" fill="#fff" opacity="0.04"/>
-
-          <!-- Window with kibble inside -->
-          <rect x="155" y="108" width="18" height="100" rx="2" fill="#050403"/>
-          <rect x="156" y="109" width="16" height="98" rx="1.5" fill="#0a0908"/>
-          <!-- Kibble -->
-          <circle cx="161" cy="185" r="2.5" fill="#e8a87c"/>
-          <circle cx="167" cy="182" r="2.2" fill="#c38d5e"/>
-          <circle cx="164" cy="190" r="2.8" fill="#f4d4ad"/>
-          <circle cx="163" cy="195" r="2" fill="#a87a4d"/>
-          <circle cx="169" cy="193" r="2.3" fill="#e8a87c"/>
-          <circle cx="162" cy="200" r="2.5" fill="#c38d5e"/>
-          <circle cx="166" cy="203" r="2" fill="#f4d4ad"/>
-
-          <!-- Soft glow around window -->
-          <ellipse cx="164" cy="195" rx="20" ry="25" fill="url(#kibbleGlow)"/>
-
-          <!-- Camera section -->
-          <rect x="58" y="234" width="124" height="44" rx="4" fill="#050403"/>
-
-          <!-- Camera lens -->
-          <circle cx="120" cy="256" r="7" fill="#1c1916"/>
-          <circle cx="120" cy="256" r="5" fill="#000"/>
-          <circle cx="120" cy="256" r="3" fill="#0a0908"/>
-          <!-- Lens highlight -->
-          <circle cx="118" cy="254" r="1.5" fill="#e8a87c" opacity="0.7"/>
-          <circle cx="121" cy="257" r="0.6" fill="#fff" opacity="0.5"/>
-
-          <!-- Status indicators -->
-          <circle cx="85" cy="256" r="1.8" fill="#e8a87c" opacity="0.9"/>
-          <circle cx="95" cy="256" r="1.5" fill="#e8a87c" opacity="0.4"/>
-          <circle cx="145" cy="256" r="1.5" fill="#e8a87c" opacity="0.6"/>
-          <circle cx="155" cy="256" r="1.5" fill="#fff" opacity="0.3"/>
-
-          <!-- WiFi icon -->
-          <g transform="translate(78, 246)" stroke="#e8a87c" stroke-width="1" fill="none" opacity="0.6">
-            <path d="M 0 4 Q 4 0 8 4"/>
-            <path d="M 1.5 5.5 Q 4 3 6.5 5.5"/>
-            <circle cx="4" cy="6.5" r="0.7" fill="#e8a87c"/>
-          </g>
-
-          <!-- Base -->
-          <rect x="50" y="278" width="140" height="26" rx="4" fill="url(#bodyGrad2)"/>
-
-          <!-- Food bowl -->
-          <ellipse cx="78" cy="318" rx="48" ry="9" fill="#1c1916"/>
-          <ellipse cx="78" cy="314" rx="40" ry="6" fill="#0a0908"/>
-          <!-- Kibble in bowl -->
-          <circle cx="72" cy="313" r="2.5" fill="#e8a87c"/>
-          <circle cx="78" cy="312" r="2.3" fill="#c38d5e"/>
-          <circle cx="83" cy="313" r="2.5" fill="#f4d4ad"/>
-          <circle cx="76" cy="315" r="2" fill="#a87a4d"/>
-          <circle cx="81" cy="316" r="2.2" fill="#e8a87c"/>
-          <circle cx="74" cy="316" r="1.8" fill="#c38d5e"/>
-        </svg>
+        <img src="images/produit.png" alt="Miamio - Distributeur intelligent" class="product-hero-img" />
       </div>
     </div>
   </div>
@@ -1450,29 +1376,7 @@
           <span class="size-vol">3.0 L</span>
         </div>
         <div class="size-vis">
-          <svg viewBox="0 0 200 260" style="width:140px; filter: drop-shadow(0 30px 50px rgba(0,0,0,0.6));">
-            <defs>
-              <linearGradient id="b3" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#3a3835"/><stop offset="100%" stop-color="#0a0908"/>
-              </linearGradient>
-            </defs>
-            <ellipse cx="100" cy="240" rx="65" ry="5" fill="#000" opacity="0.4"/>
-            <ellipse cx="100" cy="50" rx="55" ry="17" fill="url(#b3)"/>
-            <rect x="45" y="50" width="110" height="18" fill="url(#b3)"/>
-            <rect x="45" y="68" width="110" height="100" rx="2" fill="url(#b3)"/>
-            <rect x="125" y="85" width="14" height="70" rx="1.5" fill="#000"/>
-            <circle cx="132" cy="135" r="2" fill="#e8a87c"/>
-            <circle cx="129" cy="142" r="1.7" fill="#c38d5e"/>
-            <rect x="55" y="168" width="90" height="32" rx="3" fill="#050403"/>
-            <circle cx="100" cy="184" r="5" fill="#1c1916"/>
-            <circle cx="100" cy="184" r="2" fill="#e8a87c" opacity="0.8"/>
-            <rect x="50" y="200" width="100" height="18" rx="3" fill="url(#b3)"/>
-            <ellipse cx="65" cy="232" rx="32" ry="6" fill="#1c1916"/>
-            <ellipse cx="65" cy="229" rx="26" ry="4" fill="#0a0908"/>
-            <circle cx="60" cy="228" r="1.7" fill="#e8a87c"/>
-            <circle cx="65" cy="228" r="1.5" fill="#c38d5e"/>
-            <circle cx="70" cy="229" r="1.8" fill="#f4d4ad"/>
-          </svg>
+          <img src="images/produit.png" alt="Miamio Mini 3L" class="size-img size-img-mini" />
         </div>
         <h3 class="size-name"><strong>Miamio</strong> Mini</h3>
         <div class="size-cap">Capacité 3 litres</div>
@@ -1492,35 +1396,7 @@
           <span class="size-vol">5.0 L</span>
         </div>
         <div class="size-vis">
-          <svg viewBox="0 0 200 280" style="width:175px; filter: drop-shadow(0 35px 60px rgba(232,168,124,0.15)) drop-shadow(0 30px 50px rgba(0,0,0,0.6));">
-            <defs>
-              <linearGradient id="b5" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#3a3835"/><stop offset="100%" stop-color="#0a0908"/>
-              </linearGradient>
-            </defs>
-            <ellipse cx="100" cy="260" rx="75" ry="5" fill="#000" opacity="0.4"/>
-            <ellipse cx="100" cy="52" rx="65" ry="20" fill="url(#b5)"/>
-            <rect x="35" y="52" width="130" height="22" fill="url(#b5)"/>
-            <ellipse cx="85" cy="48" rx="25" ry="5" fill="#fff" opacity="0.06"/>
-            <rect x="35" y="74" width="130" height="120" rx="3" fill="url(#b5)"/>
-            <rect x="132" y="92" width="15" height="86" rx="2" fill="#000"/>
-            <circle cx="138" cy="148" r="2" fill="#e8a87c"/>
-            <circle cx="141" cy="155" r="1.8" fill="#c38d5e"/>
-            <circle cx="139" cy="162" r="2.2" fill="#f4d4ad"/>
-            <rect x="50" y="194" width="100" height="38" rx="4" fill="#050403"/>
-            <circle cx="100" cy="213" r="6" fill="#1c1916"/>
-            <circle cx="100" cy="213" r="4" fill="#000"/>
-            <circle cx="100" cy="213" r="2" fill="#e8a87c" opacity="0.9"/>
-            <circle cx="75" cy="213" r="1.5" fill="#e8a87c" opacity="0.7"/>
-            <circle cx="125" cy="213" r="1.5" fill="#e8a87c" opacity="0.5"/>
-            <rect x="42" y="232" width="116" height="20" rx="3" fill="url(#b5)"/>
-            <ellipse cx="68" cy="252" rx="40" ry="7" fill="#1c1916"/>
-            <ellipse cx="68" cy="248" rx="34" ry="5" fill="#0a0908"/>
-            <circle cx="62" cy="247" r="2" fill="#e8a87c"/>
-            <circle cx="68" cy="247" r="2" fill="#c38d5e"/>
-            <circle cx="74" cy="247" r="2.2" fill="#f4d4ad"/>
-            <circle cx="66" cy="249" r="1.7" fill="#a87a4d"/>
-          </svg>
+          <img src="images/produit.png" alt="Miamio Classic 5L" class="size-img size-img-classic" />
         </div>
         <h3 class="size-name"><strong>Miamio</strong> Classic</h3>
         <div class="size-cap">Capacité 5 litres</div>
@@ -1540,29 +1416,7 @@
           <span class="size-vol">6.0 L</span>
         </div>
         <div class="size-vis">
-          <svg viewBox="0 0 200 290" style="width:185px; filter: drop-shadow(0 30px 50px rgba(0,0,0,0.6));">
-            <defs>
-              <linearGradient id="b6" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#3a3835"/><stop offset="100%" stop-color="#0a0908"/>
-              </linearGradient>
-            </defs>
-            <ellipse cx="100" cy="270" rx="80" ry="5" fill="#000" opacity="0.4"/>
-            <ellipse cx="100" cy="55" rx="72" ry="22" fill="url(#b6)"/>
-            <rect x="28" y="55" width="144" height="24" fill="url(#b6)"/>
-            <rect x="28" y="79" width="144" height="135" rx="3" fill="url(#b6)"/>
-            <rect x="138" y="100" width="16" height="95" rx="2" fill="#000"/>
-            <circle cx="144" cy="155" r="2.2" fill="#e8a87c"/>
-            <circle cx="147" cy="162" r="2" fill="#c38d5e"/>
-            <circle cx="145" cy="170" r="2.5" fill="#f4d4ad"/>
-            <circle cx="148" cy="178" r="2" fill="#a87a4d"/>
-            <rect x="50" y="214" width="100" height="40" rx="4" fill="#050403"/>
-            <circle cx="100" cy="234" r="6.5" fill="#1c1916"/>
-            <circle cx="100" cy="234" r="4.5" fill="#000"/>
-            <circle cx="100" cy="234" r="2.3" fill="#e8a87c" opacity="0.9"/>
-            <circle cx="73" cy="234" r="1.7" fill="#e8a87c" opacity="0.7"/>
-            <circle cx="127" cy="234" r="1.7" fill="#e8a87c" opacity="0.5"/>
-            <rect x="40" y="254" width="120" height="22" rx="3" fill="url(#b6)"/>
-          </svg>
+          <img src="images/produit.png" alt="Miamio Max 6L" class="size-img size-img-max" />
         </div>
         <h3 class="size-name"><strong>Miamio</strong> Max</h3>
         <div class="size-cap">Capacité 6 litres</div>
