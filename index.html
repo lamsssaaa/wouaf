@@ -3,10 +3,12 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Miamio — Veillez sur eux. Toujours.</title>
+<title>Bowly Smart — Le distributeur connecté qui veille sur eux</title>
+<meta name="description" content="Distributeur automatique intelligent avec caméra HD, vision nocturne et audio bidirectionnel. Restez connecté à vos animaux où que vous soyez." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+
 <style>
   :root {
     --bg: #0a0908;
@@ -15,9 +17,9 @@
     --ink: #f5f1eb;
     --ink-dim: #a8a097;
     --ink-mute: #6b6259;
-    --warm: #e8a87c;       /* soft amber */
-    --warm-2: #c38d5e;      /* deeper amber */
-    --warm-3: #f4d4ad;      /* cream */
+    --warm: #e8a87c;
+    --warm-2: #c38d5e;
+    --warm-3: #f4d4ad;
     --line: rgba(245,241,235,0.08);
     --line-2: rgba(245,241,235,0.16);
     --serif: 'Instrument Serif', serif;
@@ -26,7 +28,7 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: auto; } /* Lenis prend le relais */
 
   body {
     background: var(--bg);
@@ -38,7 +40,6 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* GRAIN */
   body::before {
     content: '';
     position: fixed;
@@ -53,30 +54,70 @@
   /* CURSOR */
   body { cursor: none; }
   .cursor {
-    position: fixed;
+    position: fixed; top: 0; left: 0;
     width: 12px; height: 12px;
     background: var(--warm);
     border-radius: 50%;
     pointer-events: none;
     z-index: 999;
     mix-blend-mode: difference;
-    transition: transform 0.2s, width 0.3s, height 0.3s;
+    transform: translate3d(-100px, -100px, 0);
   }
   .cursor-ring {
-    position: fixed;
+    position: fixed; top: 0; left: 0;
     width: 40px; height: 40px;
     border: 1px solid var(--warm);
     border-radius: 50%;
     pointer-events: none;
     z-index: 998;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), width 0.3s, height 0.3s;
+    transform: translate3d(-100px, -100px, 0);
+    transition: width 0.3s, height 0.3s;
   }
   a, button, .clickable { cursor: none; }
-  a:hover ~ .cursor, button:hover ~ .cursor {
-    transform: scale(1.5);
+
+  /* PRELOADER */
+  .preloader {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .preloader-logo {
+    font-family: var(--serif);
+    font-size: 4rem;
+    font-style: italic;
+    letter-spacing: -0.04em;
+  }
+  .preloader-logo span { color: var(--warm); }
+  .preloader-bar {
+    width: 200px;
+    height: 2px;
+    background: var(--line);
+    overflow: hidden;
+    position: relative;
+  }
+  .preloader-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--warm);
+    transform: translateX(-100%);
+    animation: load 1.8s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  }
+  @keyframes load { to { transform: translateX(0); } }
+  .preloader-num {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-mute);
   }
 
-  /* ====== NAV ====== */
+  /* NAV */
   nav {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -89,15 +130,16 @@
     backdrop-filter: blur(24px) saturate(1.2);
     background: rgba(10,9,8,0.4);
     border-bottom: 1px solid var(--line);
+    transform: translateY(-100%);
   }
   .logo {
     font-family: var(--serif);
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     font-style: italic;
     letter-spacing: -0.02em;
     display: flex;
     align-items: baseline;
-    gap: 0.2rem;
+    gap: 0.4rem;
   }
   .logo-mark {
     display: inline-block;
@@ -105,20 +147,16 @@
     border-radius: 50%;
     background: var(--warm);
     margin-right: 0.5rem;
-    animation: pulse-dot 2s ease-in-out infinite;
   }
-  @keyframes pulse-dot {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(232,168,124,0.6); }
-    50% { box-shadow: 0 0 0 6px rgba(232,168,124,0); }
-  }
+  .logo em { color: var(--warm); font-style: italic; }
   .nav-center {
     display: flex;
     gap: 2rem;
     justify-content: center;
     font-family: var(--mono);
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.18em;
   }
   .nav-center a {
     color: var(--ink-dim);
@@ -139,15 +177,14 @@
   }
   .nav-center a:hover { color: var(--ink); }
   .nav-center a:hover::after { transform: scaleX(1); transform-origin: left; }
-
   .nav-time {
     font-family: var(--mono);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: var(--ink-mute);
     letter-spacing: 0.1em;
   }
 
-  /* ====== HERO ====== */
+  /* === HERO === */
   .hero {
     min-height: 100vh;
     padding: 8rem 2.5rem 4rem;
@@ -158,52 +195,42 @@
     align-items: center;
     overflow: hidden;
   }
-
-  /* Ambient glow */
   .hero::before {
     content: '';
     position: absolute;
-    top: 40%;
-    right: -10%;
-    width: 700px;
-    height: 700px;
+    top: 40%; right: -10%;
+    width: 700px; height: 700px;
     background: radial-gradient(circle, rgba(232,168,124,0.18) 0%, transparent 65%);
     filter: blur(40px);
     pointer-events: none;
-    animation: drift 20s ease-in-out infinite;
   }
-  @keyframes drift {
-    0%, 100% { transform: translate(0, 0); }
-    50% { transform: translate(-100px, 50px); }
-  }
-
-  .hero-left {
-    position: relative;
-    z-index: 2;
-  }
+  .hero-left { position: relative; z-index: 2; }
 
   .hero-eyebrow {
     display: inline-flex;
     align-items: center;
     gap: 0.7rem;
     font-family: var(--mono);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.22em;
     color: var(--ink-dim);
     padding: 0.5rem 1rem;
     border: 1px solid var(--line-2);
     border-radius: 100px;
     margin-bottom: 2.5rem;
-    opacity: 0;
-    animation: enter 1s 0.2s forwards;
   }
-  .hero-eyebrow::before {
-    content: '';
+  .hero-eyebrow .pulse {
     width: 6px; height: 6px;
     background: var(--warm);
     border-radius: 50%;
-    animation: pulse-dot 2s ease-in-out infinite;
+    box-shadow: 0 0 0 0 var(--warm);
+    animation: pulse-glow 2s ease-out infinite;
+  }
+  @keyframes pulse-glow {
+    0% { box-shadow: 0 0 0 0 rgba(232,168,124,0.6); }
+    70% { box-shadow: 0 0 0 8px rgba(232,168,124,0); }
+    100% { box-shadow: 0 0 0 0 rgba(232,168,124,0); }
   }
 
   .hero h1 {
@@ -214,37 +241,12 @@
     font-weight: 400;
     margin-bottom: 2rem;
   }
-  .hero h1 .word {
+  .hero h1 .line { display: block; overflow: hidden; }
+  .hero h1 .line span {
     display: inline-block;
-    opacity: 0;
-    transform: translateY(40px);
-    animation: enter 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform: translateY(110%);
   }
-  .hero h1 .word:nth-child(1) { animation-delay: 0.3s; }
-  .hero h1 .word:nth-child(2) { animation-delay: 0.4s; }
-  .hero h1 .word:nth-child(3) { animation-delay: 0.5s; }
-  .hero h1 .word:nth-child(4) { animation-delay: 0.6s; }
-  .hero h1 .word:nth-child(5) { animation-delay: 0.7s; }
-  .hero h1 em {
-    font-style: italic;
-    color: var(--warm);
-    position: relative;
-  }
-  .hero h1 em::after {
-    content: '';
-    position: absolute;
-    bottom: 0.1em;
-    left: -0.05em; right: -0.05em;
-    height: 2px;
-    background: var(--warm);
-    transform: scaleX(0);
-    transform-origin: left;
-    animation: underline-grow 1.5s 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-  @keyframes underline-grow { to { transform: scaleX(1); } }
-  @keyframes enter {
-    to { opacity: 1; transform: translateY(0); }
-  }
+  .hero h1 em { font-style: italic; color: var(--warm); }
 
   .hero-desc {
     font-size: 1.1rem;
@@ -253,7 +255,6 @@
     margin-bottom: 2.5rem;
     line-height: 1.6;
     opacity: 0;
-    animation: enter 1s 0.9s forwards;
   }
 
   .hero-cta-row {
@@ -261,7 +262,6 @@
     align-items: center;
     gap: 1.5rem;
     opacity: 0;
-    animation: enter 1s 1.1s forwards;
   }
 
   .btn-main {
@@ -276,6 +276,7 @@
     font-size: 0.95rem;
     overflow: hidden;
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: none;
   }
   .btn-main::before {
     content: '';
@@ -284,9 +285,9 @@
     background: linear-gradient(135deg, var(--warm-3), var(--warm));
     transform: translateY(100%);
     transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
-    z-index: -1;
+    z-index: 0;
   }
-  .btn-main:hover { transform: translateY(-3px); color: var(--bg); }
+  .btn-main:hover { transform: translateY(-3px); }
   .btn-main:hover::before { transform: translateY(0); }
   .btn-main span { position: relative; z-index: 1; }
 
@@ -299,7 +300,8 @@
     border: none;
     font-size: 0.95rem;
     font-family: var(--sans);
-    transition: gap 0.3s;
+    transition: gap 0.3s, color 0.3s;
+    cursor: none;
   }
   .btn-text:hover { gap: 1rem; color: var(--warm); }
   .btn-text-arrow {
@@ -318,7 +320,6 @@
     transform: rotate(-45deg);
   }
 
-  /* Hero stats below */
   .hero-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -327,7 +328,6 @@
     padding-top: 2rem;
     border-top: 1px solid var(--line);
     opacity: 0;
-    animation: enter 1s 1.3s forwards;
   }
   .stat-num {
     font-family: var(--serif);
@@ -339,61 +339,39 @@
   }
   .stat-label {
     font-family: var(--mono);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.18em;
     color: var(--ink-mute);
   }
 
-  /* Hero Right - Product showcase */
+  /* Hero Right */
   .hero-right {
     position: relative;
     z-index: 2;
-    height: 75vh;
+    height: 80vh;
     min-height: 600px;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-
   .product-orbit {
     position: relative;
-    width: 100%;
-    height: 100%;
+    width: 100%; height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-
-  /* Orbit rings */
   .orbit-ring {
     position: absolute;
     top: 50%; left: 50%;
     border: 1px solid var(--line);
     border-radius: 50%;
-    animation: rotate-ring 40s linear infinite;
-  }
-  .orbit-1 {
-    width: 580px; height: 580px;
     transform: translate(-50%, -50%);
-    animation-duration: 60s;
   }
-  .orbit-2 {
-    width: 460px; height: 460px;
-    transform: translate(-50%, -50%);
-    animation-duration: 45s;
-    animation-direction: reverse;
-    border-color: var(--line-2);
-    border-style: dashed;
-  }
-  .orbit-3 {
-    width: 340px; height: 340px;
-    transform: translate(-50%, -50%);
-    animation-duration: 30s;
-  }
-  @keyframes rotate-ring { to { transform: translate(-50%, -50%) rotate(360deg); } }
-
-  /* Orbit dots */
+  .orbit-1 { width: 580px; height: 580px; }
+  .orbit-2 { width: 460px; height: 460px; border-style: dashed; border-color: var(--line-2); }
+  .orbit-3 { width: 340px; height: 340px; }
   .orbit-dot {
     position: absolute;
     width: 8px; height: 8px;
@@ -405,38 +383,26 @@
   .orbit-2 .orbit-dot { bottom: -4px; left: 50%; transform: translateX(-50%); background: var(--warm-3); box-shadow: 0 0 15px var(--warm-3); }
   .orbit-3 .orbit-dot { top: 50%; right: -4px; transform: translateY(-50%); }
 
-  /* Product image */
-  .product-hero {
+  .product-hero-img {
     position: relative;
     z-index: 5;
-    animation: float-product 8s ease-in-out infinite;
-    filter: drop-shadow(0 60px 100px rgba(0,0,0,0.7));
-    opacity: 0;
-    animation: enter 1.5s 0.5s forwards, float-product 8s 2s ease-in-out infinite;
-  }
-  .product-hero svg { width: clamp(240px, 32vw, 400px); }
-  .product-hero-img {
     width: clamp(280px, 38vw, 460px);
     height: auto;
     display: block;
     filter: drop-shadow(0 50px 80px rgba(0,0,0,0.5)) drop-shadow(0 0 60px rgba(232,168,124,0.15));
-  }
-  @keyframes float-product {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-25px) rotate(-1deg); }
+    opacity: 0;
   }
 
-  /* Tags around product */
   .product-tag {
     position: absolute;
     z-index: 6;
-    padding: 0.7rem 1.2rem;
+    padding: 0.6rem 1rem;
     background: rgba(20,18,16,0.85);
     backdrop-filter: blur(12px);
     border: 1px solid var(--line-2);
     border-radius: 100px;
     font-family: var(--mono);
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     text-transform: uppercase;
     letter-spacing: 0.15em;
     color: var(--ink-dim);
@@ -444,33 +410,30 @@
     align-items: center;
     gap: 0.6rem;
     opacity: 0;
-    animation: enter 0.8s forwards;
   }
   .product-tag::before {
     content: '';
     width: 6px; height: 6px;
     background: var(--warm);
     border-radius: 50%;
-    animation: pulse-dot 2s ease-in-out infinite;
   }
-  .tag-1 { top: 15%; left: 5%; animation-delay: 1.5s; }
-  .tag-2 { top: 35%; right: 0%; animation-delay: 1.7s; }
-  .tag-3 { bottom: 25%; left: 8%; animation-delay: 1.9s; }
+  .tag-1 { top: 15%; left: 5%; }
+  .tag-2 { top: 35%; right: 0%; }
+  .tag-3 { bottom: 25%; left: 8%; }
 
-  /* ====== MARQUEE ====== */
+  /* MARQUEE */
   .marquee-section {
     padding: 3rem 0;
     border-top: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
     overflow: hidden;
     background: var(--bg-2);
-    position: relative;
   }
   .marquee {
     display: inline-flex;
     gap: 4rem;
     white-space: nowrap;
-    animation: marquee-scroll 40s linear infinite;
+    will-change: transform;
   }
   .marquee-item {
     font-family: var(--serif);
@@ -479,25 +442,21 @@
     letter-spacing: -0.03em;
     color: var(--ink);
   }
-  .marquee-item.dim { color: var(--ink-mute); -webkit-text-stroke: 1px var(--ink-mute); color: transparent; }
+  .marquee-item.dim {
+    -webkit-text-stroke: 1px var(--ink-mute);
+    color: transparent;
+  }
   .marquee-divider {
     width: 12px; height: 12px;
     background: var(--warm);
     border-radius: 50%;
     align-self: center;
-  }
-  @keyframes marquee-scroll {
-    to { transform: translateX(-50%); }
+    flex-shrink: 0;
   }
 
-  /* ====== SECTIONS COMMON ====== */
+  /* Section commons */
   section { position: relative; }
-
-  .container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 2.5rem;
-  }
+  .container { max-width: 1400px; margin: 0 auto; padding: 0 2.5rem; }
 
   .label-row {
     display: flex;
@@ -513,14 +472,14 @@
   }
   .label-text {
     font-family: var(--mono);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.25em;
     color: var(--warm);
   }
   .label-num {
     font-family: var(--mono);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     color: var(--ink-mute);
     letter-spacing: 0.1em;
   }
@@ -534,89 +493,122 @@
   }
   .h-display em { font-style: italic; color: var(--warm); }
 
-  /* ====== FEATURES SECTION ====== */
-  .features { padding: 10rem 0; }
-
-  .features-header {
+  /* === FEATURES PINNED === */
+  .features-pinned {
+    position: relative;
+    padding: 8rem 0 4rem;
+  }
+  .pinned-wrap {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4rem;
-    margin-bottom: 6rem;
-    align-items: end;
+    align-items: start;
+    padding: 0 2.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
   }
-  .features-header p {
-    color: var(--ink-dim);
-    font-size: 1.05rem;
-    max-width: 450px;
-    line-height: 1.7;
+  .pinned-left {
+    position: sticky;
+    top: 20vh;
+    height: fit-content;
   }
-
-  .features-list {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .feature-row {
-    display: grid;
-    grid-template-columns: 80px 1fr 1.2fr 200px;
-    gap: 3rem;
-    align-items: center;
-    padding: 2.5rem 0;
-    border-top: 1px solid var(--line);
+  .pinned-image {
     position: relative;
-    transition: background 0.5s;
-  }
-  .feature-row:last-child { border-bottom: 1px solid var(--line); }
-  .feature-row::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 0;
-    height: 1px;
-    background: var(--warm);
-    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .feature-row:hover::before { width: 100%; }
-  .feature-row:hover .feature-name { color: var(--warm); }
-  .feature-row:hover .feature-icon-block { background: var(--warm); color: var(--bg); border-color: var(--warm); }
-
-  .feature-num {
-    font-family: var(--mono);
-    font-size: 0.85rem;
-    color: var(--ink-mute);
-    letter-spacing: 0.1em;
-  }
-  .feature-name {
-    font-family: var(--serif);
-    font-size: clamp(1.5rem, 2.5vw, 2.2rem);
-    font-style: italic;
-    letter-spacing: -0.02em;
-    transition: color 0.4s;
-  }
-  .feature-desc {
-    color: var(--ink-dim);
-    font-size: 0.95rem;
-    line-height: 1.6;
-  }
-  .feature-icon-block {
-    width: 60px; height: 60px;
-    border: 1px solid var(--line-2);
-    border-radius: 12px;
+    aspect-ratio: 3/4;
+    border-radius: 24px;
+    border: 1px solid var(--line);
+    background: radial-gradient(ellipse at center, var(--bg-3) 0%, var(--bg) 70%);
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: auto;
-    transition: all 0.4s;
   }
-  .feature-icon-block svg { width: 28px; height: 28px; }
+  .pinned-image img {
+    width: 70%;
+    height: auto;
+    filter: drop-shadow(0 30px 60px rgba(0,0,0,0.5));
+  }
+  .pinned-label {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--warm);
+    padding: 0.5rem 0.8rem;
+    background: rgba(10,9,8,0.7);
+    border: 1px solid var(--line-2);
+    border-radius: 100px;
+    backdrop-filter: blur(10px);
+  }
 
-  /* ====== SIZES — BENTO BOARD ====== */
+  .pinned-right {
+    display: flex;
+    flex-direction: column;
+    gap: 8rem;
+    padding-top: 2rem;
+  }
+  .feat-block {
+    padding: 2rem 0;
+  }
+  .feat-num {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--warm);
+    letter-spacing: 0.15em;
+    margin-bottom: 1.5rem;
+  }
+  .feat-block h3 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    font-style: italic;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    font-weight: 400;
+    margin-bottom: 1.5rem;
+  }
+  .feat-block p {
+    font-size: 1.05rem;
+    color: var(--ink-dim);
+    line-height: 1.7;
+    max-width: 480px;
+  }
+
+  /* === CINEMATIC === */
+  .cinematic {
+    padding: 16rem 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cinematic::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(232,168,124,0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .cinematic .h-display {
+    max-width: 1100px;
+    margin: 0 auto;
+    font-size: clamp(2.5rem, 8vw, 7rem);
+    line-height: 1.02;
+    position: relative;
+    z-index: 2;
+  }
+  .cinematic .h-display .word {
+    display: inline-block;
+    opacity: 0.2;
+    transition: opacity 0.5s;
+  }
+
+  /* === SIZES === */
   .sizes {
     padding: 10rem 0;
     background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 50%, var(--bg) 100%);
-    position: relative;
   }
-
   .sizes-header {
     text-align: center;
     margin-bottom: 6rem;
@@ -630,26 +622,25 @@
     margin-right: auto;
     font-size: 1.05rem;
   }
-
   .sizes-board {
     display: grid;
-    grid-template-columns: 1fr 1.15fr 1fr;
-    gap: 1.5rem;
-    align-items: stretch;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
   }
-
   .size {
     position: relative;
     background: var(--bg-2);
     border: 1px solid var(--line);
-    border-radius: 32px;
-    padding: 2.5rem 2rem;
+    border-radius: 28px;
+    padding: 2rem 1.5rem;
     overflow: hidden;
     transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     flex-direction: column;
   }
-
   .size::before {
     content: '';
     position: absolute;
@@ -665,7 +656,6 @@
     border-color: var(--warm);
     box-shadow: 0 40px 80px rgba(0,0,0,0.5);
   }
-
   .size.featured {
     background: linear-gradient(180deg, rgba(232,168,124,0.08), var(--bg-2) 40%);
     border-color: var(--line-2);
@@ -674,7 +664,7 @@
     content: '';
     position: absolute;
     top: -1px; left: -1px; right: -1px; bottom: -1px;
-    border-radius: 32px;
+    border-radius: 28px;
     padding: 1px;
     background: linear-gradient(180deg, var(--warm) 0%, transparent 50%);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -683,106 +673,103 @@
     mask-composite: exclude;
     pointer-events: none;
   }
-
   .size-head {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     position: relative;
     z-index: 2;
   }
   .size-tag {
     font-family: var(--mono);
-    font-size: 0.7rem;
+    font-size: 0.66rem;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.18em;
     color: var(--ink-mute);
   }
   .size-tag.hot {
     color: var(--warm);
     background: rgba(232,168,124,0.1);
-    padding: 0.35rem 0.7rem;
+    padding: 0.3rem 0.6rem;
     border-radius: 100px;
     border: 1px solid rgba(232,168,124,0.3);
   }
   .size-vol {
     font-family: var(--mono);
-    font-size: 0.7rem;
+    font-size: 0.66rem;
     color: var(--ink-mute);
     letter-spacing: 0.1em;
   }
-
   .size-vis {
     flex: 1;
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    margin: 1rem 0 2rem;
-    min-height: 240px;
+    margin: 1rem 0 1.5rem;
+    min-height: 200px;
     position: relative;
     z-index: 2;
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .size:hover .size-vis { transform: translateY(-12px) scale(1.04); }
+  .size:hover .size-vis { transform: translateY(-10px) scale(1.04); }
 
   .size-img {
     height: auto;
     display: block;
     filter: drop-shadow(0 30px 50px rgba(0,0,0,0.5));
   }
-  .size-img-mini    { width: 140px; }
-  .size-img-classic { width: 180px; filter: drop-shadow(0 35px 60px rgba(232,168,124,0.15)) drop-shadow(0 30px 50px rgba(0,0,0,0.5)); }
-  .size-img-max     { width: 210px; }
+  .size-img-1 { width: 110px; }
+  .size-img-2 { width: 130px; }
+  .size-img-3 { width: 150px; filter: drop-shadow(0 35px 60px rgba(232,168,124,0.15)) drop-shadow(0 30px 50px rgba(0,0,0,0.5)); }
+  .size-img-4 { width: 170px; }
 
   .size-name {
     font-family: var(--serif);
-    font-size: 2.2rem;
+    font-size: 1.7rem;
     font-style: italic;
     letter-spacing: -0.02em;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
     position: relative;
     z-index: 2;
   }
   .size-name strong { font-style: normal; font-weight: 400; }
-
   .size-cap {
     font-family: var(--mono);
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.2em;
     color: var(--warm);
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
     position: relative;
     z-index: 2;
   }
-
   .size-desc {
     color: var(--ink-dim);
-    font-size: 0.92rem;
-    margin-bottom: 2rem;
-    line-height: 1.6;
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
     position: relative;
     z-index: 2;
+    flex-grow: 1;
   }
-
   .size-pricing {
     display: flex;
     align-items: baseline;
-    gap: 0.8rem;
-    margin-bottom: 1.5rem;
+    gap: 0.6rem;
+    margin-bottom: 1.2rem;
     position: relative;
     z-index: 2;
   }
   .size-price {
     font-family: var(--serif);
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 400;
     letter-spacing: -0.02em;
   }
   .size-price-currency {
     font-family: var(--mono);
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     color: var(--ink-mute);
     text-transform: uppercase;
   }
@@ -790,23 +777,23 @@
     color: var(--ink-mute);
     text-decoration: line-through;
     font-family: var(--mono);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
-
   .size-btn {
     width: 100%;
-    padding: 1.1rem;
+    padding: 0.95rem;
     background: var(--bg-3);
     color: var(--ink);
     border: 1px solid var(--line-2);
     border-radius: 100px;
     font-family: var(--sans);
     font-weight: 500;
-    font-size: 0.95rem;
+    font-size: 0.88rem;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     z-index: 2;
     overflow: hidden;
+    cursor: none;
   }
   .size-btn::before {
     content: '';
@@ -819,76 +806,28 @@
   }
   .size-btn:hover { color: var(--bg); border-color: var(--warm); }
   .size-btn:hover::before { transform: translateY(0); }
-
   .size.featured .size-btn {
     background: var(--ink);
     color: var(--bg);
     border-color: var(--ink);
   }
 
-  /* ====== CINEMATIC ====== */
-  .cinematic {
-    padding: 12rem 0;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .cinematic::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at center, rgba(232,168,124,0.08) 0%, transparent 60%);
-    pointer-events: none;
-  }
-
-  .cinematic .h-display {
-    max-width: 1100px;
-    margin: 0 auto;
-    font-size: clamp(2.5rem, 7vw, 6rem);
-    line-height: 1.05;
-    position: relative;
-    z-index: 2;
-  }
-
-  /* ====== STORY ====== */
-  .story {
-    padding: 10rem 0;
-  }
+  /* === STORY === */
+  .story { padding: 10rem 0; }
   .story-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 5rem;
     align-items: center;
   }
-
   .story-visual {
     position: relative;
     aspect-ratio: 4/5;
     border-radius: 24px;
     overflow: hidden;
     border: 1px solid var(--line);
-    background: var(--bg-2);
+    background: var(--bg-3);
   }
-  .story-visual::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(circle at 30% 30%, rgba(232,168,124,0.15), transparent 60%),
-      linear-gradient(135deg, var(--bg-3), var(--bg));
-  }
-  .story-visual-icon {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 9rem;
-    filter: grayscale(0.4) opacity(0.4);
-    transition: all 0.6s;
-  }
-  .story-visual:hover .story-visual-icon { filter: grayscale(0) opacity(0.6); transform: scale(1.08); }
-
   .story-quote {
     position: absolute;
     bottom: 2rem;
@@ -916,7 +855,6 @@
     margin-top: 0.8rem;
     font-style: normal;
   }
-
   .story-content p {
     color: var(--ink-dim);
     font-size: 1.05rem;
@@ -925,7 +863,7 @@
   }
   .story-content p:first-of-type { margin-top: 2.5rem; }
 
-  /* ====== TESTIMONIALS — SLIDER ====== */
+  /* === TESTIMONIALS === */
   .testimonials {
     padding: 8rem 0;
     background: var(--bg-2);
@@ -933,14 +871,16 @@
     border-bottom: 1px solid var(--line);
     overflow: hidden;
   }
-
+  .testi-header {
+    text-align: center;
+    margin-bottom: 4rem;
+    padding: 0 2.5rem;
+  }
   .testimonials-track {
     display: flex;
     gap: 1.5rem;
-    animation: testi-scroll 60s linear infinite;
+    will-change: transform;
   }
-  .testimonials:hover .testimonials-track { animation-play-state: paused; }
-
   .testi-card {
     flex: 0 0 380px;
     background: var(--bg-3);
@@ -948,32 +888,21 @@
     border-radius: 20px;
     padding: 2rem;
   }
-  .testi-stars {
-    color: var(--warm);
-    letter-spacing: 0.2em;
-    margin-bottom: 1.2rem;
-    font-size: 0.9rem;
-  }
+  .testi-stars { color: var(--warm); letter-spacing: 0.2em; margin-bottom: 1.2rem; font-size: 0.9rem; }
   .testi-card blockquote {
     font-family: var(--serif);
     font-style: italic;
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     line-height: 1.4;
     margin-bottom: 1.5rem;
     letter-spacing: -0.01em;
   }
-  .testi-author {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
+  .testi-author { display: flex; align-items: center; gap: 1rem; }
   .testi-avatar {
     width: 40px; height: 40px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--warm), var(--warm-2));
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     font-family: var(--serif);
     font-size: 1rem;
     color: var(--bg);
@@ -981,22 +910,17 @@
   }
   .testi-info { font-size: 0.85rem; }
   .testi-name { color: var(--ink); }
-  .testi-meta { color: var(--ink-mute); font-family: var(--mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.2rem; }
+  .testi-meta { color: var(--ink-mute); font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.2rem; }
 
-  @keyframes testi-scroll {
-    to { transform: translateX(-50%); }
-  }
-
-  /* ====== FAQ ====== */
-  .faq { padding: 10rem 0; max-width: 900px; margin: 0 auto; }
+  /* === FAQ === */
+  .faq { padding: 10rem 0; max-width: 900px; margin: 0 auto; padding-left: 2.5rem; padding-right: 2.5rem; }
   .faq-list { margin-top: 4rem; }
-
   .faq-item {
     border-top: 1px solid var(--line);
     transition: all 0.5s;
+    cursor: none;
   }
   .faq-item:last-child { border-bottom: 1px solid var(--line); }
-
   .faq-q {
     display: flex;
     justify-content: space-between;
@@ -1009,14 +933,11 @@
     transition: color 0.3s;
   }
   .faq-item:hover .faq-q { color: var(--warm); }
-
   .faq-toggle {
     width: 36px; height: 36px;
     border: 1px solid var(--line-2);
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     flex-shrink: 0;
     margin-left: 2rem;
@@ -1028,7 +949,6 @@
     transform: rotate(45deg);
   }
   .faq-toggle svg { width: 14px; height: 14px; }
-
   .faq-a {
     max-height: 0;
     overflow: hidden;
@@ -1043,7 +963,7 @@
     padding-right: 4rem;
   }
 
-  /* ====== CTA FINAL ====== */
+  /* === CTA FINAL === */
   .cta-final {
     padding: 10rem 0;
     text-align: center;
@@ -1080,14 +1000,12 @@
     z-index: 2;
   }
 
-  /* ====== FOOTER ====== */
+  /* === FOOTER === */
   footer {
     background: var(--bg-2);
     padding: 5rem 0 2rem;
     border-top: 1px solid var(--line);
-    position: relative;
   }
-
   .footer-top {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1fr;
@@ -1095,7 +1013,6 @@
     padding-bottom: 4rem;
     border-bottom: 1px solid var(--line);
   }
-
   .footer-brand h3 {
     font-family: var(--serif);
     font-size: 2.5rem;
@@ -1103,11 +1020,11 @@
     letter-spacing: -0.02em;
     margin-bottom: 1rem;
   }
+  .footer-brand h3 em { color: var(--warm); }
   .footer-brand p { color: var(--ink-dim); max-width: 340px; line-height: 1.6; }
-
   .footer-col h4 {
     font-family: var(--mono);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 0.2em;
     color: var(--warm);
@@ -1118,11 +1035,11 @@
     color: var(--ink-dim);
     text-decoration: none;
     margin-bottom: 0.8rem;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     transition: all 0.3s;
+    cursor: none;
   }
   .footer-col a:hover { color: var(--ink); transform: translateX(4px); }
-
   .footer-bottom {
     padding-top: 2rem;
     display: flex;
@@ -1130,11 +1047,10 @@
     align-items: center;
     color: var(--ink-mute);
     font-family: var(--mono);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.15em;
   }
-
   .footer-mega {
     font-family: var(--serif);
     font-size: clamp(6rem, 22vw, 22rem);
@@ -1148,46 +1064,326 @@
     user-select: none;
   }
 
-  /* ====== REVEAL ====== */
-  .reveal { opacity: 0; transform: translateY(40px); transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1); }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
+  /* === STORY VISUAL IMG === */
+  .story-visual-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .story-visual:hover .story-visual-img { transform: scale(1.05); }
 
-  /* ====== MOBILE ====== */
-  @media (max-width: 1024px) {
-    .feature-row { grid-template-columns: 60px 1fr; }
-    .feature-row > *:nth-child(3), .feature-row > *:nth-child(4) { grid-column: 2; }
-    .feature-icon-block { display: none; }
+  /* === CONFIGURATEUR === */
+  .config-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 2.5rem;
+    align-items: start;
   }
 
+  .config-visual {
+    position: sticky;
+    top: 8rem;
+    aspect-ratio: 3/4;
+    background: radial-gradient(ellipse at center top, rgba(232,168,124,0.1), transparent 60%), var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .config-image-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .config-img {
+    width: 75%;
+    max-width: 320px;
+    height: auto;
+    filter: drop-shadow(0 50px 80px rgba(0,0,0,0.5)) drop-shadow(0 0 60px rgba(232,168,124,0.12));
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .config-spec {
+    margin-top: 1rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--warm);
+    padding: 0.6rem 1.2rem;
+    background: rgba(232,168,124,0.08);
+    border: 1px solid rgba(232,168,124,0.25);
+    border-radius: 100px;
+  }
+
+  .config-options {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .opt-group { }
+
+  .opt-label {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+  }
+  .opt-label-num {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--warm);
+    padding: 0.25rem 0.5rem;
+    border: 1px solid rgba(232,168,124,0.3);
+    border-radius: 4px;
+    letter-spacing: 0.1em;
+  }
+  .opt-label-text {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--ink-dim);
+  }
+
+  .opt-grid {
+    display: grid;
+    gap: 0.7rem;
+  }
+  .opt-grid-2 { grid-template-columns: 1fr 1fr; }
+  .opt-grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+  .opt-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    color: var(--ink);
+    text-align: left;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .opt-btn:hover:not(.opt-disabled) {
+    border-color: var(--line-2);
+    background: var(--bg-3);
+  }
+  .opt-btn.active {
+    border-color: var(--warm);
+    background: rgba(232,168,124,0.06);
+  }
+  .opt-btn.active::after {
+    content: '';
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    width: 16px;
+    height: 16px;
+    background: var(--warm);
+    border-radius: 50%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='%230a0908' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+    background-size: 11px;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .opt-btn.opt-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .opt-btn-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-dim);
+  }
+  .opt-btn.active .opt-btn-icon { color: var(--warm); }
+  .opt-btn-icon svg { width: 100%; height: 24px; }
+
+  .opt-btn-text { flex: 1; }
+  .opt-btn-name {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-style: italic;
+    line-height: 1;
+    margin-bottom: 0.2rem;
+  }
+  .opt-btn-sub {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .opt-btn-size {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 1.2rem 0.5rem;
+    text-align: center;
+  }
+  .opt-btn-size .opt-btn-name { font-family: var(--serif); font-size: 1.5rem; }
+  .opt-btn-size .opt-btn-sub { font-size: 0.65rem; }
+
+  .opt-color-dot {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.2);
+  }
+
+  /* RECAP */
+  .config-recap {
+    padding: 1.8rem;
+    background: linear-gradient(135deg, rgba(232,168,124,0.08), rgba(232,168,124,0.02));
+    border: 1px solid rgba(232,168,124,0.2);
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  .config-summary-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+    margin-bottom: 0.4rem;
+  }
+  .config-summary-value {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    font-style: italic;
+    letter-spacing: -0.01em;
+  }
+  .config-price-wrap {
+    text-align: right;
+  }
+  .config-price-old {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--ink-mute);
+    text-decoration: line-through;
+    margin-bottom: 0.2rem;
+  }
+  .config-price {
+    font-family: var(--serif);
+    font-size: 2.2rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--warm-3);
+  }
+  .config-price-curr {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    margin-left: 0.2rem;
+  }
+
+  .btn-config {
+    padding: 1.4rem;
+    font-size: 1rem;
+    width: 100%;
+  }
+
+  .config-bonus {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin-top: 0.5rem;
+  }
+  .bonus-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 0.88rem;
+    color: var(--ink-dim);
+    padding: 0.7rem 1rem;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: 100px;
+  }
+  .bonus-item svg {
+    width: 16px;
+    height: 16px;
+    color: var(--warm);
+    flex-shrink: 0;
+  }
+
+  /* === MOBILE === */
+  @media (max-width: 1100px) {
+    .config-wrap { grid-template-columns: 1fr; gap: 2.5rem; }
+    .config-visual { position: relative; top: 0; max-width: 480px; margin: 0 auto; aspect-ratio: 4/5; }
+  }
   @media (max-width: 900px) {
     body { cursor: auto; }
     .cursor, .cursor-ring { display: none; }
-    a, button, .clickable { cursor: pointer; }
+    a, button, .clickable, .faq-item, .size-btn, .btn-main, .btn-text { cursor: pointer; }
     nav { padding: 1rem 1.2rem; grid-template-columns: auto auto; }
     .nav-center { display: none; }
     .nav-time { display: none; }
     .hero { grid-template-columns: 1fr; padding: 6rem 1.5rem 3rem; gap: 0; }
     .hero-right { height: 55vh; min-height: 400px; }
-    .hero-stats { grid-template-columns: repeat(3, 1fr); }
-    .stat-num { font-size: 1.5rem; }
-    .features-header { grid-template-columns: 1fr; gap: 2rem; }
+    .pinned-wrap { grid-template-columns: 1fr; gap: 2rem; }
+    .pinned-left { position: relative; top: 0; margin-bottom: 3rem; }
+    .pinned-image { max-width: 360px; margin: 0 auto; }
+    .pinned-right { gap: 4rem; }
     .container { padding: 0 1.5rem; }
-    .sizes-board { grid-template-columns: 1fr; gap: 1.5rem; }
+    .config-wrap { padding: 0 1.5rem; }
+    .opt-grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .config-recap { flex-direction: column; align-items: flex-start; }
+    .config-price-wrap { text-align: left; align-self: flex-end; }
     .story-grid { grid-template-columns: 1fr; gap: 3rem; }
     .footer-top { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
     .testi-card { flex: 0 0 300px; }
-    .product-tag { font-size: 0.65rem; padding: 0.5rem 0.9rem; }
+    .product-tag { font-size: 0.62rem; padding: 0.4rem 0.7rem; }
   }
 </style>
 </head>
 <body>
 
+<!-- PRELOADER -->
+<div class="preloader" id="preloader">
+  <div class="preloader-logo">Bowly<span>.</span></div>
+  <div class="preloader-bar"></div>
+  <div class="preloader-num" id="preloaderNum">00 / 100</div>
+</div>
+
+<!-- CURSOR -->
 <div class="cursor"></div>
 <div class="cursor-ring"></div>
 
 <!-- NAV -->
-<nav>
-  <div class="logo"><span class="logo-mark"></span>Miam<em>io</em></div>
+<nav id="nav">
+  <div class="logo"><span class="logo-mark"></span>Bowly <em>Smart</em></div>
   <div class="nav-center">
     <a href="#features">Fonctions</a>
     <a href="#sizes">Modèles</a>
@@ -1200,14 +1396,14 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-left">
-    <div class="hero-eyebrow">Édition 2026 · Nouveau</div>
+    <div class="hero-eyebrow"><span class="pulse"></span>Édition 2026 · Nouveau</div>
     <h1>
-      <span class="word">Nourrir.</span>
-      <span class="word">Voir.</span>
-      <span class="word">Aimer.</span><br>
-      <span class="word"><em>Toujours.</em></span>
+      <span class="line"><span>Nourrir.</span></span>
+      <span class="line"><span>Voir.</span></span>
+      <span class="line"><span>Aimer.</span></span>
+      <span class="line"><span><em>Toujours.</em></span></span>
     </h1>
-    <p class="hero-desc">Le premier distributeur intelligent qui combine caméra HD, vision nocturne et audio bidirectionnel. Restez connecté à eux — même à des milliers de kilomètres.</p>
+    <p class="hero-desc">Le premier distributeur connecté qui combine caméra HD, vision nocturne et audio bidirectionnel. Restez auprès d'eux — même à des milliers de kilomètres.</p>
     <div class="hero-cta-row">
       <button class="btn-main"><span>Commander dès 89 CHF</span></button>
       <button class="btn-text">
@@ -1219,7 +1415,7 @@
     </div>
     <div class="hero-stats">
       <div>
-        <div class="stat-num">12'400+</div>
+        <div class="stat-num" data-count="12400">0</div>
         <div class="stat-label">Familles équipées</div>
       </div>
       <div>
@@ -1235,24 +1431,20 @@
 
   <div class="hero-right">
     <div class="product-orbit">
-      <div class="orbit-ring orbit-1"><div class="orbit-dot"></div></div>
-      <div class="orbit-ring orbit-2"><div class="orbit-dot"></div></div>
-      <div class="orbit-ring orbit-3"><div class="orbit-dot"></div></div>
-
+      <div class="orbit-ring orbit-1" id="orbit1"><div class="orbit-dot"></div></div>
+      <div class="orbit-ring orbit-2" id="orbit2"><div class="orbit-dot"></div></div>
+      <div class="orbit-ring orbit-3" id="orbit3"><div class="orbit-dot"></div></div>
       <div class="product-tag tag-1">Caméra HD 1080p</div>
       <div class="product-tag tag-2">Vision nocturne</div>
       <div class="product-tag tag-3">App connectée</div>
-
-      <div class="product-hero">
-        <img src="images/produit.png" alt="Miamio - Distributeur intelligent" class="product-hero-img" />
-      </div>
+      <img src="images/produit.png" alt="Bowly Smart" class="product-hero-img" id="productHero" />
     </div>
   </div>
 </section>
 
 <!-- MARQUEE -->
 <div class="marquee-section">
-  <div class="marquee">
+  <div class="marquee" id="marquee">
     <span class="marquee-item">Caméra 1080p</span>
     <span class="marquee-divider"></span>
     <span class="marquee-item dim">Vision nocturne</span>
@@ -1280,69 +1472,54 @@
   </div>
 </div>
 
-<!-- FEATURES -->
-<section class="features" id="features">
-  <div class="container">
-    <div class="features-header reveal">
-      <div>
-        <div class="label-row">
-          <div class="label-line"></div>
-          <span class="label-text">Capacités</span>
-          <span class="label-num">— 01</span>
-        </div>
-        <h2 class="h-display">Six raisons<br>de les <em>aimer</em><br>plus fort.</h2>
-      </div>
-      <p>Chaque détail de Miamio a été pensé pour une chose : maintenir le lien. Entre vous et eux. Entre le moment où vous partez et celui où vous rentrez.</p>
+<!-- FEATURES PINNED -->
+<section class="features-pinned" id="features">
+  <div class="container" style="margin-bottom: 5rem;">
+    <div class="label-row">
+      <div class="label-line"></div>
+      <span class="label-text">Capacités</span>
+      <span class="label-num">— 01</span>
     </div>
+    <h2 class="h-display">Six raisons<br>de les <em>aimer</em> plus fort.</h2>
+  </div>
 
-    <div class="features-list">
-      <div class="feature-row reveal">
-        <div class="feature-num">01</div>
-        <div class="feature-name">Caméra HD 1080p</div>
-        <div class="feature-desc">Surveillance temps réel avec grand angle 160°. Voyez chaque moment, chaque câlin manqué.</div>
-        <div class="feature-icon-block">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-        </div>
+  <div class="pinned-wrap">
+    <div class="pinned-left">
+      <div class="pinned-image">
+        <span class="pinned-label" id="pinnedLabel">01 · Caméra HD</span>
+        <img src="images/produit.png" alt="Bowly Smart" />
       </div>
-      <div class="feature-row reveal">
-        <div class="feature-num">02</div>
-        <div class="feature-name">Programmation précise</div>
-        <div class="feature-desc">Jusqu'à 10 repas par jour, portions ajustables au gramme. Tout depuis l'app.</div>
-        <div class="feature-icon-block">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </div>
+    </div>
+    <div class="pinned-right">
+      <div class="feat-block" data-label="01 · Caméra HD">
+        <div class="feat-num">01</div>
+        <h3>Caméra HD 1080p</h3>
+        <p>Surveillance temps réel avec grand angle 160°. Voyez chaque moment, chaque câlin manqué.</p>
       </div>
-      <div class="feature-row reveal">
-        <div class="feature-num">03</div>
-        <div class="feature-name">Audio bidirectionnel</div>
-        <div class="feature-desc">Parlez-leur. Écoutez-les. La voix qui rassure, la présence qui réconforte.</div>
-        <div class="feature-icon-block">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
-        </div>
+      <div class="feat-block" data-label="02 · Programmation">
+        <div class="feat-num">02</div>
+        <h3>Programmation précise</h3>
+        <p>Jusqu'à 10 repas par jour, portions ajustables au gramme près. Tout depuis l'app.</p>
       </div>
-      <div class="feature-row reveal">
-        <div class="feature-num">04</div>
-        <div class="feature-name">Vision nocturne</div>
-        <div class="feature-desc">Capteur infrarouge automatique. La nuit, ils restent visibles. Vous restez tranquille.</div>
-        <div class="feature-icon-block">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </div>
+      <div class="feat-block" data-label="03 · Audio">
+        <div class="feat-num">03</div>
+        <h3>Audio bidirectionnel</h3>
+        <p>Parlez-leur. Écoutez-les. La voix qui rassure, la présence qui réconforte.</p>
       </div>
-      <div class="feature-row reveal">
-        <div class="feature-num">05</div>
-        <div class="feature-name">Anti-bourrage breveté</div>
-        <div class="feature-desc">Système rotatif qui élimine tout blocage. Garantie d'un repas, à chaque heure prévue.</div>
-        <div class="feature-icon-block">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        </div>
+      <div class="feat-block" data-label="04 · Vision nocturne">
+        <div class="feat-num">04</div>
+        <h3>Vision nocturne</h3>
+        <p>Capteur infrarouge automatique. La nuit, ils restent visibles. Vous restez tranquille.</p>
       </div>
-      <div class="feature-row reveal">
-        <div class="feature-num">06</div>
-        <div class="feature-name">Batterie 72h</div>
-        <div class="feature-desc">Coupure de courant ? Aucune inquiétude. Trois jours d'autonomie en secours.</div>
-        <div class="feature-icon-block">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="7" width="18" height="10" rx="2"/><line x1="22" y1="11" x2="22" y2="13"/><line x1="6" y1="11" x2="6" y2="13"/><line x1="10" y1="11" x2="10" y2="13"/></svg>
-        </div>
+      <div class="feat-block" data-label="05 · Anti-bourrage">
+        <div class="feat-num">05</div>
+        <h3>Anti-bourrage breveté</h3>
+        <p>Système rotatif qui élimine tout blocage. Garantie d'un repas, à chaque heure prévue.</p>
+      </div>
+      <div class="feat-block" data-label="06 · Batterie">
+        <div class="feat-num">06</div>
+        <h3>Batterie 72h</h3>
+        <p>Coupure de courant ? Aucune inquiétude. Trois jours d'autonomie en secours.</p>
       </div>
     </div>
   </div>
@@ -1350,83 +1527,150 @@
 
 <!-- CINEMATIC -->
 <section class="cinematic">
-  <div class="container reveal">
-    <h2 class="h-display">Parce que leur amour<br>n'attend pas <em>votre retour</em>.</h2>
+  <div class="container">
+    <h2 class="h-display" id="cineText">
+      <span class="word">Parce</span> <span class="word">que</span> <span class="word">leur</span> <span class="word">amour</span><br>
+      <span class="word">n'attend</span> <span class="word">pas</span> <span class="word"><em>votre retour</em></span><span class="word">.</span>
+    </h2>
   </div>
 </section>
 
-<!-- SIZES -->
+<!-- CONFIGURATEUR -->
 <section class="sizes" id="sizes">
-  <div class="container">
-    <div class="sizes-header reveal">
-      <div class="label-row">
-        <span class="label-text">La collection</span>
-        <span class="label-num">— 02</span>
+  <div class="container" style="text-align:center; margin-bottom: 5rem;">
+    <div class="label-row" style="justify-content: center;">
+      <span class="label-text">Configurez votre Bowly</span>
+      <span class="label-num">— 02</span>
+    </div>
+    <h2 class="h-display">Le vôtre,<br>en quelques <em>clics</em>.</h2>
+    <p style="color: var(--ink-dim); margin-top: 1.5rem; max-width: 540px; margin-left: auto; margin-right: auto; font-size: 1.05rem;">Choisissez le modèle, la taille, et nous nous occupons du reste.</p>
+  </div>
+
+  <div class="config-wrap">
+    <!-- Image dynamique -->
+    <div class="config-visual">
+      <div class="config-image-wrap">
+        <img src="images/produit.png" alt="Bowly Smart" id="configImg" class="config-img" />
       </div>
-      <h2 class="h-display">Trois tailles.<br>Un <em>compagnon</em>.</h2>
-      <p>Que vous ayez un chaton, un labrador, ou toute une tribu — il existe un Miamio fait pour vous.</p>
+      <div class="config-spec" id="configSpec">SOLO · 3 LITRES</div>
     </div>
 
-    <div class="sizes-board">
+    <!-- Sélecteurs -->
+    <div class="config-options">
 
-      <!-- MINI -->
-      <div class="size reveal">
-        <div class="size-head">
-          <span class="size-tag">Le compact</span>
-          <span class="size-vol">3.0 L</span>
+      <!-- Modèle -->
+      <div class="opt-group">
+        <div class="opt-label">
+          <span class="opt-label-num">01</span>
+          <span class="opt-label-text">Modèle</span>
         </div>
-        <div class="size-vis">
-          <img src="images/produit.png" alt="Miamio Mini 3L" class="size-img size-img-mini" />
+        <div class="opt-grid opt-grid-2">
+          <button class="opt-btn active" data-type="model" data-value="solo">
+            <div class="opt-btn-icon">
+              <svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <ellipse cx="20" cy="12" rx="10" ry="4"/>
+                <ellipse cx="20" cy="11" rx="7" ry="2.5"/>
+              </svg>
+            </div>
+            <div class="opt-btn-text">
+              <div class="opt-btn-name">Solo</div>
+              <div class="opt-btn-sub">1 gamelle · 1 animal</div>
+            </div>
+          </button>
+          <button class="opt-btn" data-type="model" data-value="duo">
+            <div class="opt-btn-icon">
+              <svg viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <ellipse cx="11" cy="12" rx="7" ry="3"/>
+                <ellipse cx="11" cy="11" rx="5" ry="2"/>
+                <ellipse cx="29" cy="12" rx="7" ry="3"/>
+                <ellipse cx="29" cy="11" rx="5" ry="2"/>
+              </svg>
+            </div>
+            <div class="opt-btn-text">
+              <div class="opt-btn-name">Duo</div>
+              <div class="opt-btn-sub">2 gamelles · 2 animaux</div>
+            </div>
+          </button>
         </div>
-        <h3 class="size-name"><strong>Miamio</strong> Mini</h3>
-        <div class="size-cap">Capacité 3 litres</div>
-        <p class="size-desc">Pour un chat ou un petit chien. Compact, élégant, discret.</p>
-        <div class="size-pricing">
-          <span class="size-price">89</span>
-          <span class="size-price-currency">CHF</span>
-          <span class="size-price-old">129 CHF</span>
-        </div>
-        <button class="size-btn">Choisir Mini —</button>
       </div>
 
-      <!-- CLASSIC -->
-      <div class="size featured reveal">
-        <div class="size-head">
-          <span class="size-tag hot">★ Le plus aimé</span>
-          <span class="size-vol">5.0 L</span>
+      <!-- Taille -->
+      <div class="opt-group">
+        <div class="opt-label">
+          <span class="opt-label-num">02</span>
+          <span class="opt-label-text">Capacité</span>
         </div>
-        <div class="size-vis">
-          <img src="images/produit.png" alt="Miamio Classic 5L" class="size-img size-img-classic" />
+        <div class="opt-grid opt-grid-4">
+          <button class="opt-btn opt-btn-size active" data-type="size" data-value="3">
+            <div class="opt-btn-name">3 L</div>
+            <div class="opt-btn-sub">Petit</div>
+          </button>
+          <button class="opt-btn opt-btn-size" data-type="size" data-value="4">
+            <div class="opt-btn-name">4 L</div>
+            <div class="opt-btn-sub">Moyen</div>
+          </button>
+          <button class="opt-btn opt-btn-size" data-type="size" data-value="5">
+            <div class="opt-btn-name">5 L</div>
+            <div class="opt-btn-sub">Grand</div>
+          </button>
+          <button class="opt-btn opt-btn-size" data-type="size" data-value="6">
+            <div class="opt-btn-name">6 L</div>
+            <div class="opt-btn-sub">XL</div>
+          </button>
         </div>
-        <h3 class="size-name"><strong>Miamio</strong> Classic</h3>
-        <div class="size-cap">Capacité 5 litres</div>
-        <p class="size-desc">Le format idéal. Pour chiens moyens ou foyers à plusieurs félins.</p>
-        <div class="size-pricing">
-          <span class="size-price">119</span>
-          <span class="size-price-currency">CHF</span>
-          <span class="size-price-old">169 CHF</span>
-        </div>
-        <button class="size-btn">Choisir Classic —</button>
       </div>
 
-      <!-- MAX -->
-      <div class="size reveal">
-        <div class="size-head">
-          <span class="size-tag">Le grand format</span>
-          <span class="size-vol">6.0 L</span>
+      <!-- Couleur (en preview) -->
+      <div class="opt-group">
+        <div class="opt-label">
+          <span class="opt-label-num">03</span>
+          <span class="opt-label-text">Couleur</span>
         </div>
-        <div class="size-vis">
-          <img src="images/produit.png" alt="Miamio Max 6L" class="size-img size-img-max" />
+        <div class="opt-grid opt-grid-2">
+          <button class="opt-btn active" data-type="color" data-value="black">
+            <div class="opt-color-dot" style="background: #1a1a1a;"></div>
+            <div class="opt-btn-text">
+              <div class="opt-btn-name">Noir</div>
+              <div class="opt-btn-sub">Mat premium</div>
+            </div>
+          </button>
+          <button class="opt-btn opt-disabled" disabled>
+            <div class="opt-color-dot" style="background: #f0ede5; border: 1px solid var(--line-2);"></div>
+            <div class="opt-btn-text">
+              <div class="opt-btn-name">Blanc</div>
+              <div class="opt-btn-sub">Bientôt disponible</div>
+            </div>
+          </button>
         </div>
-        <h3 class="size-name"><strong>Miamio</strong> Max</h3>
-        <div class="size-cap">Capacité 6 litres</div>
-        <p class="size-desc">Pour les grands chiens ou les longues absences. Autonomie ultime.</p>
-        <div class="size-pricing">
-          <span class="size-price">149</span>
-          <span class="size-price-currency">CHF</span>
-          <span class="size-price-old">199 CHF</span>
+      </div>
+
+      <!-- Récap et prix -->
+      <div class="config-recap">
+        <div class="config-summary">
+          <div class="config-summary-label">Votre configuration</div>
+          <div class="config-summary-value" id="configSummary">Bowly Solo · 3 L · Noir</div>
         </div>
-        <button class="size-btn">Choisir Max —</button>
+        <div class="config-price-wrap">
+          <div class="config-price-old"><span id="priceOld">99.90</span> CHF</div>
+          <div class="config-price"><span id="priceMain">69.90</span> <span class="config-price-curr">CHF</span></div>
+        </div>
+      </div>
+
+      <button class="btn-main btn-config"><span>Ajouter au panier — <span id="priceBtn">69.90</span> CHF</span></button>
+
+      <div class="config-bonus">
+        <div class="bonus-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9h18M5 9V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4M5 9v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9"/></svg>
+          <span>Livraison gratuite en Suisse</span>
+        </div>
+        <div class="bonus-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>2 ans de garantie incluse</span>
+        </div>
+        <div class="bonus-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12a9 9 0 1 0 9-9"/><path d="M3 4v5h5"/></svg>
+          <span>Retour gratuit 30 jours</span>
+        </div>
       </div>
 
     </div>
@@ -1437,22 +1681,22 @@
 <section class="story" id="story">
   <div class="container">
     <div class="story-grid">
-      <div class="story-visual reveal">
-        <div class="story-visual-icon">🐈</div>
+      <div class="story-visual">
+        <img src="images/lifestyle.png" alt="Chaton blanc à côté du Bowly Smart dans un intérieur lumineux" class="story-visual-img" />
         <div class="story-quote">
           <p>"Quand je partais, elle ne mangeait plus. Maintenant elle court vers la caméra dès qu'elle entend ma voix."</p>
           <cite>— Camille, Genève</cite>
         </div>
       </div>
-      <div class="story-content reveal">
+      <div class="story-content">
         <div class="label-row">
           <span class="label-text">Le manifeste</span>
           <span class="label-num">— 03</span>
         </div>
         <h2 class="h-display">Parce qu'ils <em>comptent</em>,<br>même quand on n'est pas là.</h2>
-        <p>Miamio est né d'une frustration : devoir choisir entre vivre sa vie et savoir que son animal est bien.</p>
+        <p>Bowly Smart est né d'une frustration : devoir choisir entre vivre sa vie et savoir que son animal est bien.</p>
         <p>Nous avons conçu plus qu'un distributeur. Un pont. Un fil. Une présence qui traverse les murs et les fuseaux horaires.</p>
-        <p>Aujourd'hui, plus de 12'000 familles en Suisse romande font confiance à Miamio pour veiller sur ceux qu'elles aiment.</p>
+        <p>Aujourd'hui, plus de 12'000 familles en Suisse romande font confiance à Bowly Smart pour veiller sur ceux qu'elles aiment.</p>
       </div>
     </div>
   </div>
@@ -1460,116 +1704,65 @@
 
 <!-- TESTIMONIALS -->
 <section class="testimonials">
-  <div class="testimonials-track">
-    <div class="testi-card">
-      <div class="testi-stars">★★★★★</div>
-      <blockquote>"Je voyage souvent pour le travail. Avec Miamio, je peux voir mon chat manger en direct depuis Tokyo. C'est devenu mon petit moment de réconfort."</blockquote>
-      <div class="testi-author"><div class="testi-avatar">S</div><div class="testi-info"><div class="testi-name">Sarah M.</div><div class="testi-meta">Lausanne · Maine Coon</div></div></div>
+  <div class="testi-header">
+    <div class="label-row" style="justify-content: center;">
+      <span class="label-text">Ils en parlent</span>
+      <span class="label-num">— 04</span>
     </div>
-    <div class="testi-card">
-      <div class="testi-stars">★★★★★</div>
-      <blockquote>"L'app est intuitive, la caméra est nette, et le bruit du moteur ne dérange pas mon labrador. Bluffant."</blockquote>
-      <div class="testi-author"><div class="testi-avatar">T</div><div class="testi-info"><div class="testi-name">Thomas D.</div><div class="testi-meta">Genève · Labrador</div></div></div>
-    </div>
-    <div class="testi-card">
-      <div class="testi-stars">★★★★★</div>
-      <blockquote>"J'ai trois chats. Le Miamio Max gère tout, et je peux leur parler le soir depuis le bureau. Magique."</blockquote>
-      <div class="testi-author"><div class="testi-avatar">A</div><div class="testi-info"><div class="testi-name">Anaïs P.</div><div class="testi-meta">Vevey · 3 chats</div></div></div>
-    </div>
-    <div class="testi-card">
-      <div class="testi-stars">★★★★★</div>
-      <blockquote>"Installation en 5 minutes. Vision nocturne incroyable. Je dors mieux depuis."</blockquote>
-      <div class="testi-author"><div class="testi-avatar">M</div><div class="testi-info"><div class="testi-name">Marc F.</div><div class="testi-meta">Sion · Berger australien</div></div></div>
-    </div>
-    <div class="testi-card">
-      <div class="testi-stars">★★★★★</div>
-      <blockquote>"Le design est superbe, ça ne fait pas tâche dans le salon. Et c'est bien plus fiable que mon ancien distributeur."</blockquote>
-      <div class="testi-author"><div class="testi-avatar">J</div><div class="testi-info"><div class="testi-name">Julie B.</div><div class="testi-meta">Fribourg · Chaton</div></div></div>
-    </div>
-    <!-- duplicate for loop -->
-    <div class="testi-card">
-      <div class="testi-stars">★★★★★</div>
-      <blockquote>"Je voyage souvent pour le travail. Avec Miamio, je peux voir mon chat manger en direct depuis Tokyo. C'est devenu mon petit moment de réconfort."</blockquote>
-      <div class="testi-author"><div class="testi-avatar">S</div><div class="testi-info"><div class="testi-name">Sarah M.</div><div class="testi-meta">Lausanne · Maine Coon</div></div></div>
-    </div>
-    <div class="testi-card">
-      <div class="testi-stars">★★★★★</div>
-      <blockquote>"L'app est intuitive, la caméra est nette, et le bruit du moteur ne dérange pas mon labrador. Bluffant."</blockquote>
-      <div class="testi-author"><div class="testi-avatar">T</div><div class="testi-info"><div class="testi-name">Thomas D.</div><div class="testi-meta">Genève · Labrador</div></div></div>
-    </div>
-    <div class="testi-card">
-      <div class="testi-stars">★★★★★</div>
-      <blockquote>"J'ai trois chats. Le Miamio Max gère tout, et je peux leur parler le soir depuis le bureau. Magique."</blockquote>
-      <div class="testi-author"><div class="testi-avatar">A</div><div class="testi-info"><div class="testi-name">Anaïs P.</div><div class="testi-meta">Vevey · 3 chats</div></div></div>
-    </div>
-    <div class="testi-card">
-      <div class="testi-stars">★★★★★</div>
-      <blockquote>"Installation en 5 minutes. Vision nocturne incroyable. Je dors mieux depuis."</blockquote>
-      <div class="testi-author"><div class="testi-avatar">M</div><div class="testi-info"><div class="testi-name">Marc F.</div><div class="testi-meta">Sion · Berger australien</div></div></div>
-    </div>
-    <div class="testi-card">
-      <div class="testi-stars">★★★★★</div>
-      <blockquote>"Le design est superbe, ça ne fait pas tâche dans le salon. Et c'est bien plus fiable que mon ancien distributeur."</blockquote>
-      <div class="testi-author"><div class="testi-avatar">J</div><div class="testi-info"><div class="testi-name">Julie B.</div><div class="testi-meta">Fribourg · Chaton</div></div></div>
-    </div>
+    <h2 class="h-display">12'000+ <em>familles</em><br>rassurées.</h2>
+  </div>
+  <div class="testimonials-track" id="testiTrack">
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><blockquote>"Je voyage souvent pour le travail. Avec Bowly, je peux voir mon chat manger en direct depuis Tokyo."</blockquote><div class="testi-author"><div class="testi-avatar">S</div><div class="testi-info"><div class="testi-name">Sarah M.</div><div class="testi-meta">Lausanne · Maine Coon</div></div></div></div>
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><blockquote>"L'app est intuitive, la caméra est nette, et le bruit du moteur ne dérange pas mon labrador. Bluffant."</blockquote><div class="testi-author"><div class="testi-avatar">T</div><div class="testi-info"><div class="testi-name">Thomas D.</div><div class="testi-meta">Genève · Labrador</div></div></div></div>
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><blockquote>"J'ai trois chats. Le Bowly Max gère tout, et je peux leur parler le soir depuis le bureau."</blockquote><div class="testi-author"><div class="testi-avatar">A</div><div class="testi-info"><div class="testi-name">Anaïs P.</div><div class="testi-meta">Vevey · 3 chats</div></div></div></div>
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><blockquote>"Installation en 5 minutes. Vision nocturne incroyable. Je dors mieux depuis."</blockquote><div class="testi-author"><div class="testi-avatar">M</div><div class="testi-info"><div class="testi-name">Marc F.</div><div class="testi-meta">Sion · Berger australien</div></div></div></div>
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><blockquote>"Le design est superbe, ça ne fait pas tâche dans le salon. Bien plus fiable que mon ancien."</blockquote><div class="testi-author"><div class="testi-avatar">J</div><div class="testi-info"><div class="testi-name">Julie B.</div><div class="testi-meta">Fribourg · Chaton</div></div></div></div>
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><blockquote>"Je voyage souvent pour le travail. Avec Bowly, je peux voir mon chat manger en direct depuis Tokyo."</blockquote><div class="testi-author"><div class="testi-avatar">S</div><div class="testi-info"><div class="testi-name">Sarah M.</div><div class="testi-meta">Lausanne · Maine Coon</div></div></div></div>
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><blockquote>"L'app est intuitive, la caméra est nette, et le bruit du moteur ne dérange pas mon labrador."</blockquote><div class="testi-author"><div class="testi-avatar">T</div><div class="testi-info"><div class="testi-name">Thomas D.</div><div class="testi-meta">Genève · Labrador</div></div></div></div>
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><blockquote>"J'ai trois chats. Le Bowly Max gère tout."</blockquote><div class="testi-author"><div class="testi-avatar">A</div><div class="testi-info"><div class="testi-name">Anaïs P.</div><div class="testi-meta">Vevey · 3 chats</div></div></div></div>
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><blockquote>"Installation en 5 minutes. Vision nocturne incroyable."</blockquote><div class="testi-author"><div class="testi-avatar">M</div><div class="testi-info"><div class="testi-name">Marc F.</div><div class="testi-meta">Sion · Berger australien</div></div></div></div>
+    <div class="testi-card"><div class="testi-stars">★★★★★</div><blockquote>"Le design est superbe, bien plus fiable que mon ancien."</blockquote><div class="testi-author"><div class="testi-avatar">J</div><div class="testi-info"><div class="testi-name">Julie B.</div><div class="testi-meta">Fribourg · Chaton</div></div></div></div>
   </div>
 </section>
 
 <!-- FAQ -->
 <section class="faq" id="faq">
-  <div class="reveal">
-    <div class="label-row">
-      <span class="label-text">Questions</span>
-      <span class="label-num">— 04</span>
-    </div>
-    <h2 class="h-display">Tout ce qu'il<br>faut <em>savoir</em>.</h2>
+  <div class="label-row">
+    <span class="label-text">Questions</span>
+    <span class="label-num">— 05</span>
   </div>
+  <h2 class="h-display">Tout ce qu'il<br>faut <em>savoir</em>.</h2>
 
   <div class="faq-list">
-    <div class="faq-item reveal" onclick="this.classList.toggle('open')">
-      <div class="faq-q">
-        Combien de temps dure la livraison ?
-        <div class="faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><line x1="12" y1="5" x2="12" y2="19"/></svg></div>
-      </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">Combien de temps dure la livraison ?<div class="faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><line x1="12" y1="5" x2="12" y2="19"/></svg></div></div>
       <div class="faq-a">Livraison gratuite en Suisse sous 3 à 5 jours ouvrables. Expédition depuis nos entrepôts européens, suivi inclus.</div>
     </div>
-    <div class="faq-item reveal" onclick="this.classList.toggle('open')">
-      <div class="faq-q">
-        L'application est-elle gratuite ?
-        <div class="faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><line x1="12" y1="5" x2="12" y2="19"/></svg></div>
-      </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">L'application est-elle gratuite ?<div class="faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><line x1="12" y1="5" x2="12" y2="19"/></svg></div></div>
       <div class="faq-a">Oui, totalement. Pas d'abonnement caché, pas de fonctionnalités premium. Disponible sur iOS et Android.</div>
     </div>
-    <div class="faq-item reveal" onclick="this.classList.toggle('open')">
-      <div class="faq-q">
-        Quelle est la garantie ?
-        <div class="faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><line x1="12" y1="5" x2="12" y2="19"/></svg></div>
-      </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">Quelle est la garantie ?<div class="faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><line x1="12" y1="5" x2="12" y2="19"/></svg></div></div>
       <div class="faq-a">2 ans de garantie constructeur. Retour gratuit sous 30 jours si vous n'êtes pas satisfait.</div>
     </div>
-    <div class="faq-item reveal" onclick="this.classList.toggle('open')">
-      <div class="faq-q">
-        Compatible avec quelles croquettes ?
-        <div class="faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><line x1="12" y1="5" x2="12" y2="19"/></svg></div>
-      </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">Compatible avec quelles croquettes ?<div class="faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><line x1="12" y1="5" x2="12" y2="19"/></svg></div></div>
       <div class="faq-a">Compatible avec croquettes sèches de 2 à 15mm de diamètre. Convient aux chats comme aux chiens.</div>
     </div>
-    <div class="faq-item reveal" onclick="this.classList.toggle('open')">
-      <div class="faq-q">
-        Comment se connecte-t-il au Wi-Fi ?
-        <div class="faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><line x1="12" y1="5" x2="12" y2="19"/></svg></div>
-      </div>
-      <div class="faq-a">Configuration en 2 minutes via l'application. Compatible Wi-Fi 2.4 GHz (la plupart des box).</div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">Comment se connecte-t-il au Wi-Fi ?<div class="faq-toggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><line x1="12" y1="5" x2="12" y2="19"/></svg></div></div>
+      <div class="faq-a">Configuration en 2 minutes via l'application. Compatible Wi-Fi 2.4 GHz.</div>
     </div>
   </div>
 </section>
 
 <!-- CTA FINAL -->
 <section class="cta-final">
-  <div class="container reveal">
+  <div class="container">
     <h2>Pour eux.<br>Pour <em>vous</em>.</h2>
     <p>Faites partie des 12'000 familles qui ne s'inquiètent plus.</p>
-    <button class="btn-main"><span>Commander Miamio — dès 89 CHF</span></button>
+    <button class="btn-main"><span>Commander Bowly Smart — dès 89 CHF</span></button>
   </div>
 </section>
 
@@ -1578,15 +1771,15 @@
   <div class="container">
     <div class="footer-top">
       <div class="footer-brand">
-        <h3>Miam<em>io.</em></h3>
-        <p>Le distributeur intelligent, conçu en Suisse, pour celles et ceux qui aiment leurs animaux comme leur propre famille.</p>
+        <h3>Bowly <em>Smart.</em></h3>
+        <p>Le distributeur connecté, conçu en Suisse, pour celles et ceux qui aiment leurs animaux comme leur propre famille.</p>
       </div>
       <div class="footer-col">
         <h4>Collection</h4>
-        <a href="#">Miamio Mini · 3L</a>
-        <a href="#">Miamio Classic · 5L</a>
-        <a href="#">Miamio Max · 6L</a>
-        <a href="#">Accessoires</a>
+        <a href="#">Bowly Mini · 3L</a>
+        <a href="#">Bowly Plus · 4L</a>
+        <a href="#">Bowly Classic · 5L</a>
+        <a href="#">Bowly Max · 6L</a>
       </div>
       <div class="footer-col">
         <h4>Support</h4>
@@ -1603,62 +1796,391 @@
         <a href="#">Presse</a>
       </div>
     </div>
-    <div class="footer-mega">Miamio.</div>
+    <div class="footer-mega">bowly.</div>
     <div class="footer-bottom">
-      <div>© 2026 · Conçu en Suisse, avec ♥</div>
+      <div>© 2026 Bowly Smart · Conçu en Suisse</div>
       <div>CHF · FR / EN / DE</div>
     </div>
   </div>
 </footer>
 
+<!-- LIBRARIES -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+
 <script>
-  // Reveal
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+(function() {
 
-  // Custom cursor
-  const cursor = document.querySelector('.cursor');
-  const ring = document.querySelector('.cursor-ring');
-  let mx = 0, my = 0, rx = 0, ry = 0;
-  window.addEventListener('mousemove', (e) => {
-    mx = e.clientX; my = e.clientY;
-    cursor.style.transform = `translate(${mx - 6}px, ${my - 6}px)`;
-  });
-  function animateRing() {
-    rx += (mx - rx) * 0.15;
-    ry += (my - ry) * 0.15;
-    ring.style.transform = `translate(${rx - 20}px, ${ry - 20}px)`;
-    requestAnimationFrame(animateRing);
-  }
-  animateRing();
+  // ===== PRELOADER =====
+  let progress = 0;
+  const num = document.getElementById('preloaderNum');
+  const loadInt = setInterval(() => {
+    progress += Math.random() * 8;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(loadInt);
+    }
+    num.textContent = String(Math.floor(progress)).padStart(2, '0') + ' / 100';
+  }, 90);
 
-  // Hover cursor states
-  document.querySelectorAll('a, button, .clickable, .faq-item').forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      cursor.style.width = '6px';
-      cursor.style.height = '6px';
-      ring.style.width = '60px';
-      ring.style.height = '60px';
-    });
-    el.addEventListener('mouseleave', () => {
-      cursor.style.width = '12px';
-      cursor.style.height = '12px';
-      ring.style.width = '40px';
-      ring.style.height = '40px';
-    });
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      gsap.to('#preloader', {
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power2.inOut',
+        onComplete: () => {
+          document.getElementById('preloader').style.display = 'none';
+          initSite();
+        }
+      });
+    }, 1800);
   });
 
-  // Live clock in nav
-  function updateTime() {
-    const now = new Date();
-    const h = String(now.getHours()).padStart(2,'0');
-    const m = String(now.getMinutes()).padStart(2,'0');
-    document.getElementById('navTime').textContent = `${h}:${m} · GENÈVE · CH`;
+  function initSite() {
+    // ===== LENIS (smooth scroll) =====
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+    });
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+
+    // sync ScrollTrigger with Lenis
+    lenis.on('scroll', () => ScrollTrigger.update());
+    gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+    gsap.ticker.lagSmoothing(0);
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    // ===== NAV reveal =====
+    gsap.to('#nav', { y: 0, duration: 0.8, ease: 'power3.out' });
+
+    // ===== HERO title reveal (line by line) =====
+    gsap.to('.hero h1 .line span', {
+      y: 0,
+      duration: 1.2,
+      stagger: 0.12,
+      ease: 'power4.out',
+      delay: 0.2
+    });
+
+    // ===== HERO desc + CTA + stats =====
+    gsap.to('.hero-desc', { opacity: 1, y: 0, duration: 1, delay: 0.9, ease: 'power3.out' });
+    gsap.to('.hero-cta-row', { opacity: 1, y: 0, duration: 1, delay: 1.1, ease: 'power3.out' });
+    gsap.to('.hero-stats', { opacity: 1, y: 0, duration: 1, delay: 1.3, ease: 'power3.out' });
+
+    // ===== Product hero reveal =====
+    gsap.fromTo('#productHero',
+      { opacity: 0, scale: 0.7, y: 30 },
+      { opacity: 1, scale: 1, y: 0, duration: 1.5, delay: 0.6, ease: 'power3.out' }
+    );
+
+    // Product floating animation
+    gsap.to('#productHero', {
+      y: -25,
+      duration: 4,
+      yoyo: true,
+      repeat: -1,
+      ease: 'sine.inOut',
+      delay: 2
+    });
+
+    // Product tags reveal
+    gsap.to('.product-tag', {
+      opacity: 1,
+      duration: 0.8,
+      stagger: 0.15,
+      delay: 1.5,
+      ease: 'power2.out'
+    });
+
+    // Orbit rings rotation
+    gsap.to('#orbit1', { rotation: 360, duration: 60, repeat: -1, ease: 'linear' });
+    gsap.to('#orbit2', { rotation: -360, duration: 45, repeat: -1, ease: 'linear' });
+    gsap.to('#orbit3', { rotation: 360, duration: 30, repeat: -1, ease: 'linear' });
+
+    // ===== Counter animation =====
+    document.querySelectorAll('[data-count]').forEach(el => {
+      const target = parseInt(el.dataset.count);
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 90%',
+        once: true,
+        onEnter: () => {
+          gsap.to(el, {
+            innerText: target,
+            duration: 2,
+            ease: 'power2.out',
+            snap: { innerText: 1 },
+            onUpdate: function() {
+              el.innerText = Math.floor(this.targets()[0].innerText).toLocaleString('fr-CH').replace(',', "'") + '+';
+            }
+          });
+        }
+      });
+    });
+
+    // ===== Hero parallax on scroll =====
+    gsap.to('.hero-right', {
+      y: -100,
+      scrollTrigger: {
+        trigger: '.hero',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1
+      }
+    });
+    gsap.to('#productHero', {
+      rotation: 8,
+      scrollTrigger: {
+        trigger: '.hero',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 1.5
+      }
+    });
+
+    // ===== MARQUEE (scroll-velocity-driven) =====
+    const marqueeEl = document.getElementById('marquee');
+    let marqueeX = 0;
+    gsap.to(marqueeEl, {
+      x: '-50%',
+      duration: 40,
+      repeat: -1,
+      ease: 'linear'
+    });
+    // Boost on scroll
+    let lastScroll = 0;
+    let velocity = 0;
+    lenis.on('scroll', (e) => {
+      velocity = Math.min(Math.abs(e.velocity) * 0.3, 5);
+    });
+
+    // ===== FEATURES PINNED (image label updates on scroll) =====
+    const pinnedLabel = document.getElementById('pinnedLabel');
+    document.querySelectorAll('.feat-block').forEach((block, i) => {
+      ScrollTrigger.create({
+        trigger: block,
+        start: 'top center',
+        end: 'bottom center',
+        onEnter: () => {
+          pinnedLabel.textContent = block.dataset.label;
+          gsap.fromTo(pinnedLabel, { opacity: 0.3, y: -5 }, { opacity: 1, y: 0, duration: 0.4 });
+        },
+        onEnterBack: () => {
+          pinnedLabel.textContent = block.dataset.label;
+          gsap.fromTo(pinnedLabel, { opacity: 0.3, y: -5 }, { opacity: 1, y: 0, duration: 0.4 });
+        }
+      });
+
+      gsap.from(block, {
+        opacity: 0,
+        y: 60,
+        duration: 1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: block,
+          start: 'top 80%',
+          toggleActions: 'play none none reverse'
+        }
+      });
+    });
+
+    // ===== CINEMATIC text reveal (word by word) =====
+    gsap.utils.toArray('#cineText .word').forEach((word, i) => {
+      gsap.to(word, {
+        opacity: 1,
+        scrollTrigger: {
+          trigger: word,
+          start: 'top 75%',
+          end: 'top 40%',
+          scrub: 1
+        }
+      });
+    });
+
+    // ===== SECTION TITLES reveal =====
+    gsap.utils.toArray('.h-display').forEach(el => {
+      if (el.id === 'cineText') return;
+      gsap.from(el, {
+        opacity: 0,
+        y: 50,
+        duration: 1.2,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 85%',
+          toggleActions: 'play none none reverse'
+        }
+      });
+    });
+
+    // ===== CONFIGURATEUR =====
+    const config = { model: 'solo', size: '3', color: 'black' };
+
+    // Grille de prix (Solo / Duo +20 CHF)
+    const prices = {
+      solo: { 3: { now: 69.90, old: 99.90 }, 4: { now: 84.90, old: 119.90 }, 5: { now: 99.90, old: 139.90 }, 6: { now: 114.90, old: 159.90 } },
+      duo:  { 3: { now: 89.90, old: 129.90 }, 4: { now: 104.90, old: 149.90 }, 5: { now: 119.90, old: 169.90 }, 6: { now: 134.90, old: 189.90 } }
+    };
+
+    const modelNames = { solo: 'Solo', duo: 'Duo' };
+    const colorNames = { black: 'Noir', white: 'Blanc' };
+
+    function updateConfig() {
+      const p = prices[config.model][config.size];
+      const modelLabel = modelNames[config.model];
+      const colorLabel = colorNames[config.color];
+
+      // Update summary
+      document.getElementById('configSummary').textContent = `Bowly ${modelLabel} · ${config.size} L · ${colorLabel}`;
+
+      // Update prices
+      document.getElementById('priceMain').textContent = p.now.toFixed(2);
+      document.getElementById('priceOld').textContent = p.old.toFixed(2);
+      document.getElementById('priceBtn').textContent = p.now.toFixed(2);
+
+      // Update spec label
+      document.getElementById('configSpec').textContent = `${modelLabel.toUpperCase()} · ${config.size} LITRES`;
+
+      // Animate image scale based on size
+      const sizeScales = { 3: 0.85, 4: 0.92, 5: 1.0, 6: 1.08 };
+      gsap.to('#configImg', { scale: sizeScales[config.size], duration: 0.6, ease: 'power3.out' });
+
+      // Subtle pulse on price update
+      gsap.fromTo('.config-price', { scale: 1.08 }, { scale: 1, duration: 0.5, ease: 'back.out(2)' });
+    }
+
+    document.querySelectorAll('.opt-btn[data-type]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const type = btn.dataset.type;
+        const value = btn.dataset.value;
+        // Update active state
+        document.querySelectorAll(`.opt-btn[data-type="${type}"]`).forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        // Update config
+        config[type] = value;
+        updateConfig();
+      });
+    });
+
+    // Animate config visual reveal
+    gsap.from('.config-visual', {
+      opacity: 0,
+      x: -40,
+      duration: 1.2,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: '.config-wrap', start: 'top 75%' }
+    });
+    gsap.from('.config-options > *', {
+      opacity: 0,
+      y: 40,
+      duration: 0.8,
+      stagger: 0.1,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: '.config-wrap', start: 'top 75%' }
+    });
+
+    // ===== STORY reveal =====
+    gsap.from('.story-visual', {
+      opacity: 0,
+      x: -60,
+      duration: 1.2,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: '.story-grid', start: 'top 75%' }
+    });
+    gsap.from('.story-content p', {
+      opacity: 0,
+      y: 30,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: '.story-content', start: 'top 80%' }
+    });
+
+    // ===== TESTIMONIALS infinite scroll =====
+    const testiTrack = document.getElementById('testiTrack');
+    gsap.to(testiTrack, {
+      x: '-50%',
+      duration: 60,
+      repeat: -1,
+      ease: 'linear'
+    });
+
+    // ===== FAQ items reveal =====
+    gsap.from('.faq-item', {
+      opacity: 0,
+      y: 30,
+      duration: 0.6,
+      stagger: 0.08,
+      ease: 'power2.out',
+      scrollTrigger: { trigger: '.faq-list', start: 'top 80%' }
+    });
+
+    // ===== FOOTER MEGA TEXT parallax =====
+    gsap.to('.footer-mega', {
+      x: -50,
+      scrollTrigger: {
+        trigger: '.footer-mega',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 1
+      }
+    });
+
+    // ===== CUSTOM CURSOR =====
+    const cursor = document.querySelector('.cursor');
+    const ring = document.querySelector('.cursor-ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    window.addEventListener('mousemove', (e) => {
+      mx = e.clientX;
+      my = e.clientY;
+      gsap.to(cursor, { x: mx - 6, y: my - 6, duration: 0.1, ease: 'none' });
+    });
+    function animateRing() {
+      rx += (mx - rx) * 0.18;
+      ry += (my - ry) * 0.18;
+      ring.style.transform = `translate3d(${rx - 20}px, ${ry - 20}px, 0)`;
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    // Cursor hover states
+    document.querySelectorAll('a, button, .faq-item, .opt-btn').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        gsap.to(ring, { width: 60, height: 60, duration: 0.3 });
+        gsap.to(cursor, { scale: 0.5, duration: 0.3 });
+      });
+      el.addEventListener('mouseleave', () => {
+        gsap.to(ring, { width: 40, height: 40, duration: 0.3 });
+        gsap.to(cursor, { scale: 1, duration: 0.3 });
+      });
+    });
+
+    // ===== Smooth scroll for nav links =====
+    document.querySelectorAll('.nav-center a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) lenis.scrollTo(target, { offset: -80 });
+      });
+    });
+
+    // ===== Live clock in nav =====
+    function updateTime() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2,'0');
+      const m = String(now.getMinutes()).padStart(2,'0');
+      document.getElementById('navTime').textContent = `${h}:${m} · GENÈVE · CH`;
+    }
+    updateTime();
+    setInterval(updateTime, 60000);
+
   }
-  updateTime();
-  setInterval(updateTime, 60000);
+})();
 </script>
 </body>
 </html>
